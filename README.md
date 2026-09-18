@@ -4,8 +4,11 @@ Rastreador de literatura científica sobre a API pública do arXiv. Você assina
 temas e autores, o sistema ingere as publicações novas periodicamente, e você
 consulta, busca e organiza suas leituras.
 
-> **Estado atual:** definição concluída, implementação não iniciada. Este
-> repositório hoje contém as decisões de arquitetura e o plano de trabalho.
+> **Estado atual:** fatia 1 (cadastrar/listar assinaturas) em andamento.
+> Validação de domínio e envelope de erro implementados e testados. Schema,
+> camada de dados e HTTP pendentes — bloqueados por Docker Desktop não
+> operacional no ambiente local (ver
+> [0003](docs/decisions/0003-fatia-1-assinaturas.md)).
 
 ## Por que este projeto existe
 
@@ -39,6 +42,7 @@ opções consideradas e o motivo da escolha.
 
 - [0001 — Plataforma de execução e persistência](docs/decisions/0001-plataforma-e-execucao.md)
 - [0002 — Escopo do produto](docs/decisions/0002-escopo-do-produto.md)
+- [0003 — Fatia 1: cadastrar e listar assinaturas](docs/decisions/0003-fatia-1-assinaturas.md)
 
 Design completo em
 [docs/superpowers/specs](docs/superpowers/specs/2026-09-18-arxiv-tracker-design.md).
