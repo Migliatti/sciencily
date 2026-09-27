@@ -1,7 +1,7 @@
 # 0003 — Fatia 1: cadastrar e listar assinaturas
 
 **Data:** 2026-09-18
-**Status:** Parcialmente implementada (ver Consequências)
+**Status:** Implementada (concluída em 2026-09-27)
 
 ## Contexto
 
@@ -76,6 +76,30 @@ fora do gate original: o que fazer com assinatura duplicada.
   (Docker Compose local) permanece a escolhida; o que falta é o ambiente
   ficar operacional para executá-la. Até lá, a camada de persistência e os
   testes de integração da fatia 1 não têm como ser escritos e verificados.
+
+## Conclusão (2026-09-27)
+
+- **Bloqueio contornado sem mudar a decisão 4.** A fatia foi terminada numa
+  sessão na nuvem com Postgres 16 instalado no container. Os testes de
+  integração só dependem de `DATABASE_URL`, então o `docker-compose.yml`
+  (decisão A) está no repo e serve o mesmo papel na máquina local: trocar de
+  um banco para o outro é trocar a variável, não o código.
+- Schema em `migrations/0001_assinaturas.sql`, aplicado por
+  `src/db/migrar.ts` (runner próprio, uma transação por arquivo, registro
+  em `migracoes`). Compro zero dependência ao custo de não ter rollback;
+  aceitável até a fatia 9 (deploy), que é quem força essa decisão.
+- Idempotência (escolha B) em um único comando: `INSERT … ON CONFLICT DO
+  NOTHING RETURNING` + `SELECT` da linha existente. A garantia vem do
+  `UNIQUE (tipo, valor)`, não de checagem na aplicação — checar antes de
+  inserir falha com duas requisições simultâneas.
+- `POST` devolve 201 quando cria e 200 quando a assinatura já existia.
+  Sempre 201 esconderia do cliente que nada foi criado.
+- Vocabulário de erro ampliado: `NOT_FOUND` (404), `METHOD_NOT_ALLOWED`
+  (405, com header `Allow`), `INTERNAL_ERROR` (500, sem vazar a mensagem
+  interna).
+- `npm test` passa a exigir `DATABASE_URL`; sem ela, o teste de integração
+  falha com mensagem explícita em vez de ser pulado (verde falso é pior que
+  vermelho claro).
 
 ## Divergência
 
