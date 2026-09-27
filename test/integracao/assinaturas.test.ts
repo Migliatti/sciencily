@@ -101,3 +101,13 @@ test('método não suportado devolve 405 com Allow', async () => {
   assert.equal(resposta.headers.get('allow'), 'GET, POST')
   assert.equal((await resposta.json()).error.code, 'METHOD_NOT_ALLOWED')
 })
+
+test('POSTs simultâneos do mesmo valor: exatamente um 201, o resto 200, nenhum 500', async () => {
+  for (let rodada = 0; rodada < 20; rodada++) {
+    const respostas = await Promise.all(
+      Array.from({ length: 10 }, () => postar({ tema: `corrida-${rodada}` })),
+    )
+    const status = respostas.map((r) => r.status).sort()
+    assert.deepEqual(status, [200, 200, 200, 200, 200, 200, 200, 200, 200, 201])
+  }
+})
