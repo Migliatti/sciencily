@@ -4,11 +4,18 @@ Rastreador de literatura científica sobre a API pública do arXiv. Você assina
 temas e autores, o sistema ingere as publicações novas periodicamente, e você
 consulta, busca e organiza suas leituras.
 
-> **Estado atual:** fatia 1 (cadastrar/listar assinaturas) em andamento.
-> Validação de domínio e envelope de erro implementados e testados. Schema,
-> camada de dados e HTTP pendentes — bloqueados por Docker Desktop não
-> operacional no ambiente local (ver
-> [0003](docs/decisions/0003-fatia-1-assinaturas.md)).
+> **Estado atual:** fatia 1 (cadastrar/listar assinaturas) concluída.
+> Próxima: fatia 2 (ingerir um tema sob comando manual).
+
+## Rodando
+
+```sh
+docker compose up -d
+export DATABASE_URL=postgres://postgres:postgres@localhost:5432/sciencily
+npm install
+npm test      # exige Postgres: os testes de integração batem num banco real
+npm start     # aplica migrações pendentes e sobe em :3000
+```
 
 ## Por que este projeto existe
 
