@@ -4,8 +4,8 @@ Rastreador de literatura científica sobre a API pública do arXiv. Você assina
 temas e autores, o sistema ingere as publicações novas periodicamente, e você
 consulta, busca e organiza suas leituras.
 
-> **Estado atual:** fatia 1 (cadastrar/listar assinaturas) concluída.
-> Próxima: fatia 2 (ingerir um tema sob comando manual).
+> **Estado atual:** fatias 1 (assinaturas) e 2 (ingestão manual de um tema)
+> concluídas. Próxima: fatia 3 (ingerir de novo — idempotência e versões).
 
 ## Rodando
 

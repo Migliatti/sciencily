@@ -17,13 +17,13 @@ let base: string
 
 before(async () => {
   await migrar(pool)
-  servidor = criarServidor(pool)
+  servidor = criarServidor(pool, { buscarFeed: async () => '<feed/>' })
   await new Promise<void>((resolve) => servidor.listen(0, resolve))
   base = `http://localhost:${(servidor.address() as AddressInfo).port}`
 })
 
 beforeEach(async () => {
-  await pool.query('TRUNCATE assinaturas RESTART IDENTITY')
+  await pool.query('TRUNCATE assinaturas RESTART IDENTITY CASCADE')
 })
 
 after(async () => {

@@ -130,3 +130,4 @@ paginada não embuta uma decisão que nunca passou pelo gate.
 - [0002 — Escopo do produto](docs/decisions/0002-escopo-do-produto.md)
 - [0003 — Fatia 1: cadastrar e listar assinaturas](docs/decisions/0003-fatia-1-assinaturas.md)
 - [0004 — Modo de condução do agente](docs/decisions/0004-modo-de-conducao.md)
+- [0005 — Fatia 2: ingestão de um tema](docs/decisions/0005-fatia-2-ingestao.md)

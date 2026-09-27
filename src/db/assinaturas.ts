@@ -48,6 +48,14 @@ export async function listar(pool: pg.Pool): Promise<AssinaturaSalva[]> {
   return rows.map(paraDominio)
 }
 
+export async function obterPorId(pool: pg.Pool, id: number): Promise<AssinaturaSalva | undefined> {
+  const { rows } = await pool.query<Linha>(
+    'SELECT id, tipo, valor, criada_em FROM assinaturas WHERE id = $1',
+    [id],
+  )
+  return rows[0] && paraDominio(rows[0])
+}
+
 function paraDominio(linha: Linha): AssinaturaSalva {
   return { id: linha.id, tipo: linha.tipo, valor: linha.valor, criadaEm: linha.criada_em }
 }
