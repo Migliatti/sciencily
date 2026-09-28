@@ -17,6 +17,7 @@ const fixture = await readFile(join(import.meta.dirname, '..', 'fixtures', 'arxi
 const pool = new pg.Pool({ connectionString: databaseUrl })
 const temasBuscados: string[] = []
 let feed = fixture
+let antesDeResponder: (() => Promise<void>) | undefined
 let servidor: Server
 let base: string
 
@@ -25,6 +26,7 @@ before(async () => {
   servidor = criarServidor(pool, {
     buscarFeed: async (tema) => {
       temasBuscados.push(tema)
+      await antesDeResponder?.()
       return feed
     },
   })
@@ -36,6 +38,7 @@ beforeEach(async () => {
   await pool.query('TRUNCATE assinaturas, artigos, artigos_crus RESTART IDENTITY CASCADE')
   temasBuscados.length = 0
   feed = fixture
+  antesDeResponder = undefined
 })
 
 after(async () => {
@@ -46,6 +49,13 @@ after(async () => {
 async function assinar(body: object): Promise<number> {
   const resposta = await fetch(`${base}/assinaturas`, { method: 'POST', body: JSON.stringify(body) })
   return (await resposta.json()).id
+}
+
+// Feed com n entradas distintas, clonadas da primeira entrada da fixture.
+function feedCom(n: number): string {
+  const [modelo] = fixture.match(/<entry>[\s\S]*?<\/entry>/)!
+  const entradas = Array.from({ length: n }, (_, i) => modelo.replaceAll('2609.18342', `2609.${20000 + i}`))
+  return `<feed xmlns="http://www.w3.org/2005/Atom">${entradas.join('')}</feed>`
 }
 
 function ingerir(id: number | string) {
@@ -151,10 +161,21 @@ test('o XML cru de cada ingestão continua gravado, sem sobrescrever', async () 
 
 test('ingestões simultâneas do mesmo tema não geram 500', async () => {
   const id = await assinar({ tema: 'transformers' })
+  // Nenhuma das duas recebe o feed antes de ambas pedirem, e o feed tem 50
+  // entradas: as transações se sobrepõem. Sem isso a primeira costuma terminar
+  // antes de a segunda começar, e um SELECT-antes-do-INSERT, que tem corrida,
+  // passa no teste.
+  let liberar!: () => void
+  const ambasPediram = new Promise<void>((resolve) => (liberar = resolve))
+  antesDeResponder = () => {
+    if (temasBuscados.length === 2) liberar()
+    return ambasPediram
+  }
+  feed = feedCom(50)
   const respostas = await Promise.all([ingerir(id), ingerir(id)])
   assert.deepEqual(respostas.map((r) => r.status), [200, 200])
   const corpos = await Promise.all(respostas.map((r) => r.json()))
-  assert.equal(corpos.reduce((soma, c) => soma + c.novos, 0), 3)
+  assert.equal(corpos.reduce((soma, c) => soma + c.novos, 0), 50)
   const { rows } = await pool.query('SELECT count(*)::int AS n FROM artigos')
-  assert.equal(rows[0].n, 3)
+  assert.equal(rows[0].n, 50)
 })

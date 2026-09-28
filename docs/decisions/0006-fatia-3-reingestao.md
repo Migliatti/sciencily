@@ -52,7 +52,12 @@ soma dos três é o número de entradas do feed.
   cresce uma linha por entrada a cada ingestão (append-only, verificado em
   teste).
 - Duas ingestões simultâneas do mesmo tema terminam em 200; a soma de `novos`
-  entre as duas é o total de artigos. O teste passou 10 de 10 execuções.
+  entre as duas é o total de artigos. **Correção:** a primeira versão desse
+  teste passava até com um `SELECT` antes do `INSERT`, que tem corrida, e só
+  acusava a corrida em 4 de 20 execuções, porque a primeira ingestão terminava
+  antes de a segunda começar. Agora as duas só recebem o feed quando ambas
+  pediram, e o feed tem 50 entradas. Medido em 20 execuções: com o `SELECT`
+  antes, falha 20 vezes com `23505`; com a implementação desta fatia, passa 20.
 - `ingerido_em` guarda a primeira ingestão do artigo, não a última. Quando o
   artigo foi atualizado pela última vez é `atualizado_em`, que vem do arXiv.
 - O cru cresce sem limite: 50 linhas por ingestão de tema. Isso pesa quando a
