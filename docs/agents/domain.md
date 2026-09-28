@@ -30,7 +30,7 @@ ADRs here follow the format defined in `CLAUDE.md` (rule 4), not the skills' def
 - Sections: **Contexto · Opções · Escolha · Consequências · Data**.
 - Written in Portuguese.
 - If Gabriel and Claude diverged on the decision, the divergence is recorded.
-- After creating an ADR, add it to the "Decisões registradas" list in `CLAUDE.md`.
+- The directory listing is the index of ADRs; no list elsewhere needs updating.
 
 ## Use the glossary's vocabulary
 
