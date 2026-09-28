@@ -1,7 +1,7 @@
 # 0005 — Fatia 2: ingerir um tema sob comando manual
 
 **Data:** 2026-09-27
-**Status:** Implementada — com fixture provisória (ver Consequências)
+**Status:** Implementada
 
 Primeira fatia no modo de condução de 0004: caminho com decisões tomadas por
 Claude, sem veto de Gabriel.
@@ -48,6 +48,25 @@ fatia 3. Ficou só `{ ingeridos }`.
 **6. Consulta → `all:"<tema>"`, ordem de submissão decrescente, 50
 resultados.** Paginar o arXiv fica fora da fatia.
 
+**Correção (2026-09-28): a consulta não é por frase exata.** O arXiv reduz
+as palavras ao radical: `all:"transformers"` casa "linear transformation".
+Medido contra o arXiv real, 50 resultados por consulta:
+
+| Tema | `all:` | `abs:` | `ti:` |
+|---|---|---|---|
+| `transformers` | 28 fora do tema | 28 | 17 |
+| `graph neural networks` | 0 | 0 | 0 |
+| `diffusion models` | 1 | 1 | 0 |
+
+Aceito a busca do arXiv como está porque compro zero código novo e deixo a
+decisão de casamento de texto na fatia 6 (`tsvector` vs. `ILIKE`), ao custo
+de cerca de metade de ruído em temas de uma palavra. O custo é aceitável
+porque `artigos_crus` guarda o XML de tudo, então a fatia 6 refiltra o que já
+foi ingerido sem voltar ao arXiv, e temas de várias palavras quase não trazem
+ruído. Descartados: `ti:`, que corta só parte do ruído e perde artigos que
+não citam o tema no título; e filtrar agora, que embutiria na fatia 2 uma
+decisão da fatia 6.
+
 ## Consequências
 
 - **Reingerir falha, de propósito.** O `INSERT` simples viola `artigos_pkey`
@@ -62,12 +81,12 @@ resultados.** Paginar o arXiv fica fora da fatia.
   fatia 7.
 - `npm test` roda os arquivos em série (`--test-concurrency=1`), porque dois
   arquivos de integração truncando o mesmo banco em paralelo colidem.
-- **Pendente — fixture provisória.** `export.arxiv.org` foi liberado nas
-  configurações do ambiente, mas a sessão já em curso continuou recebendo 403
-  do proxy. A fixture foi montada à mão no formato Atom documentado, e por isso
-  **nem ela nem a URL de `buscarFeedArxiv` foram validadas contra o arXiv
-  real.** Próximo passo em sessão nova: capturar uma resposta real para
-  `test/fixtures/` e rodar os testes contra ela.
+- **Fixture validada contra o arXiv real (2026-09-28).** A fixture original,
+  montada à mão sem acesso ao arXiv, ficou como casos de borda (v2,
+  entidades, afiliação). Uma resposta real capturada entrou ao lado
+  (`arxiv-real-transformers.xml`), com teste próprio. O extrator leu 50 de 50
+  entradas reais sem campo vazio, e a ingestão ponta a ponta contra o arXiv
+  gravou 50 artigos e 50 crus.
 
 ## Divergência
 

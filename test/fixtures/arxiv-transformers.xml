@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- PROVISÓRIO: montado à mão no formato Atom documentado da API do arXiv,
-     porque o container não alcançava export.arxiv.org. Substituir por uma
-     resposta real capturada (ver docs/decisions/0005-fatia-2-ingestao.md). -->
+<!-- Casos de borda montados à mão: versão v2, entidades XML, afiliação,
+     quebras de linha. A resposta real capturada está em
+     arxiv-real-transformers.xml (ver docs/decisions/0005-fatia-2-ingestao.md). -->
 <feed xmlns="http://www.w3.org/2005/Atom">
   <link href="http://arxiv.org/api/query?search_query%3Dall%3A%22transformers%22%26id_list%3D%26start%3D0%26max_results%3D3" rel="self" type="application/atom+xml"/>
   <title type="html">ArXiv Query: search_query=all:"transformers"&amp;id_list=&amp;start=0&amp;max_results=3</title>

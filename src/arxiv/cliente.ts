@@ -2,7 +2,9 @@ export type BuscarFeed = (tema: string) => Promise<string>
 
 const MAX_RESULTADOS = 50
 
-// Os 50 artigos mais recentes que citam o tema como frase exata.
+// Os 50 artigos mais recentes para o tema. O arXiv reduz palavras ao radical
+// ("transformers" casa "transformation"): temas de uma palavra trazem ruído,
+// filtrado na fatia 6 (ADR 0005, decisão 6).
 export const buscarFeedArxiv: BuscarFeed = async (tema) => {
   const url =
     'https://export.arxiv.org/api/query' +

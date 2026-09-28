@@ -69,3 +69,26 @@ test('entrada sem campo obrigatório é erro, não entrada parcial', () => {
   const xml = '<feed><entry><id>http://arxiv.org/api/errors#incorrect_id</id><title>Error</title></entry></feed>'
   assert.throws(() => extrairEntradas(xml), /arXiv/)
 })
+
+// Resposta real capturada de export.arxiv.org em 2026-09-28 para all:"transformers".
+const real = await readFile(join(import.meta.dirname, '..', 'fixtures', 'arxiv-real-transformers.xml'), 'utf8')
+
+test('lê uma resposta real do arXiv com todos os campos preenchidos', () => {
+  const entradas = extrairEntradas(real)
+  assert.deepEqual(entradas.map((e) => [e.arxivId, e.versao]), [
+    ['2609.31586', 1],
+    ['2609.31582', 1],
+    ['2609.31579', 1],
+  ])
+  for (const e of entradas) {
+    assert.ok(e.titulo && e.resumo && e.autores.length > 0, `campo vazio em ${e.arxivId}`)
+    assert.ok(!Number.isNaN(e.publicadoEm.getTime()) && !Number.isNaN(e.atualizadoEm.getTime()))
+  }
+  assert.equal(entradas[0].autores.length, 6)
+})
+
+test('busca por tema traz artigo fora do assunto: o arXiv reduz palavras ao radical (ADR 0005)', () => {
+  const [, segunda] = extrairEntradas(real)
+  assert.equal(segunda.titulo, 'Free semigroups of power series')
+  assert.doesNotMatch(segunda.titulo + segunda.resumo, /transformer/i)
+})
