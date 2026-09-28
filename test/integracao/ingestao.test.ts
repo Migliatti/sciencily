@@ -16,6 +16,7 @@ if (!databaseUrl) {
 const fixture = await readFile(join(import.meta.dirname, '..', 'fixtures', 'arxiv-transformers.xml'), 'utf8')
 const pool = new pg.Pool({ connectionString: databaseUrl })
 const temasBuscados: string[] = []
+let feed = fixture
 let servidor: Server
 let base: string
 
@@ -24,7 +25,7 @@ before(async () => {
   servidor = criarServidor(pool, {
     buscarFeed: async (tema) => {
       temasBuscados.push(tema)
-      return fixture
+      return feed
     },
   })
   await new Promise<void>((resolve) => servidor.listen(0, resolve))
@@ -34,6 +35,7 @@ before(async () => {
 beforeEach(async () => {
   await pool.query('TRUNCATE assinaturas, artigos, artigos_crus RESTART IDENTITY CASCADE')
   temasBuscados.length = 0
+  feed = fixture
 })
 
 after(async () => {
@@ -54,7 +56,7 @@ test('ingere as entradas do feed do tema e devolve a contagem', async () => {
   const id = await assinar({ tema: 'transformers' })
   const resposta = await ingerir(id)
   assert.equal(resposta.status, 200)
-  assert.deepEqual(await resposta.json(), { ingeridos: 3 })
+  assert.deepEqual(await resposta.json(), { novos: 3, atualizados: 0, inalterados: 0 })
   assert.deepEqual(temasBuscados, ['transformers'])
 })
 
@@ -96,4 +98,63 @@ test('GET na rota de ingestão devolve 405', async () => {
   const resposta = await fetch(`${base}/assinaturas/${id}/ingestao`)
   assert.equal(resposta.status, 405)
   assert.equal(resposta.headers.get('allow'), 'POST')
+})
+
+test('ingerir o mesmo tema duas vezes devolve 200 e não duplica artigos', async () => {
+  const id = await assinar({ tema: 'transformers' })
+  await ingerir(id)
+  const resposta = await ingerir(id)
+  assert.equal(resposta.status, 200)
+  assert.deepEqual(await resposta.json(), { novos: 0, atualizados: 0, inalterados: 3 })
+  const { rows } = await pool.query('SELECT count(*)::int AS n FROM artigos')
+  assert.equal(rows[0].n, 3)
+})
+
+test('artigo que passa de v1 para v2 fica com a versão nova no domínio', async () => {
+  const id = await assinar({ tema: 'transformers' })
+  await ingerir(id)
+  feed = fixture
+    .replaceAll('2609.18342v1', '2609.18342v2')
+    .replace('Sparse Attention Transformers for Long-Context', 'Sparse Attention Transformers for Very Long-Context')
+  const resposta = await ingerir(id)
+  assert.deepEqual(await resposta.json(), { novos: 0, atualizados: 1, inalterados: 2 })
+  const { rows } = await pool.query("SELECT versao, titulo FROM artigos WHERE arxiv_id = '2609.18342'")
+  assert.equal(rows[0].versao, 2)
+  assert.match(rows[0].titulo, /Very Long-Context/)
+})
+
+test('versão mais antiga no feed não rebaixa o artigo', async () => {
+  const id = await assinar({ tema: 'transformers' })
+  await ingerir(id)
+  feed = fixture.replaceAll('2609.17001v2', '2609.17001v1').replace('with &lt;1% Parameters', 'with Few Parameters')
+  const resposta = await ingerir(id)
+  assert.deepEqual(await resposta.json(), { novos: 0, atualizados: 0, inalterados: 3 })
+  const { rows } = await pool.query("SELECT versao, titulo FROM artigos WHERE arxiv_id = '2609.17001'")
+  assert.equal(rows[0].versao, 2)
+  assert.match(rows[0].titulo, /<1% Parameters/)
+})
+
+test('o XML cru de cada ingestão continua gravado, sem sobrescrever', async () => {
+  const id = await assinar({ tema: 'transformers' })
+  await ingerir(id)
+  feed = fixture.replaceAll('2609.18342v1', '2609.18342v2')
+  await ingerir(id)
+  const { rows } = await pool.query(
+    "SELECT xml FROM artigos_crus WHERE arxiv_id = '2609.18342' ORDER BY id",
+  )
+  assert.equal(rows.length, 2)
+  assert.match(rows[0].xml, /2609\.18342v1/)
+  assert.match(rows[1].xml, /2609\.18342v2/)
+  const total = await pool.query('SELECT count(*)::int AS n FROM artigos_crus')
+  assert.equal(total.rows[0].n, 6)
+})
+
+test('ingestões simultâneas do mesmo tema não geram 500', async () => {
+  const id = await assinar({ tema: 'transformers' })
+  const respostas = await Promise.all([ingerir(id), ingerir(id)])
+  assert.deepEqual(respostas.map((r) => r.status), [200, 200])
+  const corpos = await Promise.all(respostas.map((r) => r.json()))
+  assert.equal(corpos.reduce((soma, c) => soma + c.novos, 0), 3)
+  const { rows } = await pool.query('SELECT count(*)::int AS n FROM artigos')
+  assert.equal(rows[0].n, 3)
 })

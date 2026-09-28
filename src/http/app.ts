@@ -35,7 +35,8 @@ async function rotear(pool: pg.Pool, deps: Dependencias, req: IncomingMessage, r
     }
     const resultado = await ingerirAssinatura(pool, deps.buscarFeed, Number(ingestao[1]))
     if (resultado.ok) {
-      responder(res, 200, { ingeridos: resultado.ingeridos })
+      const { novos, atualizados, inalterados } = resultado
+      responder(res, 200, { novos, atualizados, inalterados })
       return
     }
     if (resultado.motivo === 'assinatura-inexistente') {

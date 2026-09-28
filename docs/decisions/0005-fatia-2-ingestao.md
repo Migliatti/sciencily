@@ -72,7 +72,7 @@ decisão da fatia 6.
 - **Reingerir falha, de propósito.** O `INSERT` simples viola `artigos_pkey`
   (`23505`), a transação desfaz tudo e a API responde 500. Isso foi
   verificado: após duas ingestões ficam 3 artigos e 3 registros crus, não 6. É
-  a entrada da fatia 3.
+  a entrada da fatia 3. **Resolvido em 0006.**
 - A ingestão é uma transação só: ou entram todas as entradas, ou nenhuma.
 - Uma entrada sem campo obrigatório (por exemplo, a entrada de erro que o
   arXiv devolve para query inválida) derruba a ingestão inteira em vez de
