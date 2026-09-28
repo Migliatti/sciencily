@@ -25,7 +25,7 @@ Publicação do arXiv no domínio, identificada pelo ID do arXiv **sem** versão
 _Avoid_: paper, publicação, entrada (quando se fala do domínio)
 
 **Versão**:
-Número da revisão de um artigo no arXiv (v1, v2…). É atributo do artigo, não parte da identidade.
+Número da revisão de um artigo no arXiv (v1, v2…). É atributo do artigo, não parte da identidade. O artigo guarda só a mais recente e nunca volta para uma anterior; as outras ficam nos artigos crus (ADR 0006).
 _Avoid_: revisão
 
 **Artigo cru**:
