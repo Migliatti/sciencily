@@ -2,12 +2,18 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import type pg from 'pg'
 import { validarCriacaoAssinatura } from '../domain/assinatura.ts'
 import { criarOuObter, listar } from '../db/assinaturas.ts'
+import type { BuscarFeed } from '../arxiv/cliente.ts'
+import { ingerirAssinatura } from '../ingestao/ingerir.ts'
 import { ErroHttp, envelopeDeErro, erroDeValidacao } from './errors.ts'
 
-export function criarServidor(pool: pg.Pool) {
+export interface Dependencias {
+  buscarFeed: BuscarFeed
+}
+
+export function criarServidor(pool: pg.Pool, deps: Dependencias) {
   return createServer(async (req, res) => {
     try {
-      await rotear(pool, req, res)
+      await rotear(pool, deps, req, res)
     } catch (erro) {
       if (erro instanceof ErroHttp) {
         responder(res, erro.status, envelopeDeErro(erro), erro.headers)
@@ -19,8 +25,24 @@ export function criarServidor(pool: pg.Pool) {
   })
 }
 
-async function rotear(pool: pg.Pool, req: IncomingMessage, res: ServerResponse) {
+async function rotear(pool: pg.Pool, deps: Dependencias, req: IncomingMessage, res: ServerResponse) {
   const { pathname } = new URL(req.url ?? '/', 'http://localhost')
+
+  const ingestao = pathname.match(/^\/assinaturas\/(\d+)\/ingestao$/)
+  if (ingestao) {
+    if (req.method !== 'POST') {
+      throw new ErroHttp(405, 'METHOD_NOT_ALLOWED', `método ${req.method} não suportado`, { allow: 'POST' })
+    }
+    const resultado = await ingerirAssinatura(pool, deps.buscarFeed, Number(ingestao[1]))
+    if (resultado.ok) {
+      responder(res, 200, { ingeridos: resultado.ingeridos })
+      return
+    }
+    if (resultado.motivo === 'assinatura-inexistente') {
+      throw new ErroHttp(404, 'NOT_FOUND', `assinatura ${ingestao[1]} não existe`)
+    }
+    throw new ErroHttp(422, 'UNSUPPORTED_TYPE', 'ingestão só está disponível para assinaturas de tema')
+  }
 
   if (pathname !== '/assinaturas') {
     throw new ErroHttp(404, 'NOT_FOUND', `rota ${pathname} não existe`)

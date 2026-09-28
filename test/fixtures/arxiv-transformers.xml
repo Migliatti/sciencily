@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Casos de borda montados à mão: versão v2, entidades XML, afiliação,
+     quebras de linha. A resposta real capturada está em
+     arxiv-real-transformers.xml (ver docs/decisions/0005-fatia-2-ingestao.md). -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <link href="http://arxiv.org/api/query?search_query%3Dall%3A%22transformers%22%26id_list%3D%26start%3D0%26max_results%3D3" rel="self" type="application/atom+xml"/>
+  <title type="html">ArXiv Query: search_query=all:"transformers"&amp;id_list=&amp;start=0&amp;max_results=3</title>
+  <id>http://arxiv.org/api/cHxbiOdZaP56ODnBPIenZhzg5f8</id>
+  <updated>2026-09-27T00:00:00-04:00</updated>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">41230</opensearch:totalResults>
+  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
+  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">3</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/2609.18342v1</id>
+    <updated>2026-09-25T17:59:58Z</updated>
+    <published>2026-09-25T17:59:58Z</published>
+    <title>Sparse Attention Transformers for Long-Context
+  Scientific Retrieval</title>
+    <summary>  We study sparse attention patterns in transformers applied to
+retrieval over scientific corpora &amp; show gains on long documents.
+</summary>
+    <author>
+      <name>Ana Souza</name>
+    </author>
+    <author>
+      <name>Wei Zhang</name>
+    </author>
+    <author>
+      <name>J. Smith</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">12 pages, 4 figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/2609.18342v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2609.18342v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.17001v2</id>
+    <updated>2026-09-24T09:12:03Z</updated>
+    <published>2026-09-21T14:30:00Z</published>
+    <title>On the Expressivity of Transformers with &lt;1% Parameters</title>
+    <summary>We bound the expressivity of heavily pruned transformers.</summary>
+    <author>
+      <name>María José Pérez</name>
+      <arxiv:affiliation xmlns:arxiv="http://arxiv.org/schemas/atom">Universidad de Chile</arxiv:affiliation>
+    </author>
+    <link href="http://arxiv.org/abs/2609.17001v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2609.17001v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.16555v1</id>
+    <updated>2026-09-20T08:00:00Z</updated>
+    <published>2026-09-20T08:00:00Z</published>
+    <title>Vision Transformers in Astronomy: A Survey</title>
+    <summary>A survey of vision transformer applications in astronomy.</summary>
+    <author>
+      <name>Kofi Mensah</name>
+    </author>
+    <author>
+      <name>Lena M&#252;ller</name>
+    </author>
+    <link href="http://arxiv.org/abs/2609.16555v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2609.16555v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>
