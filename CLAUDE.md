@@ -130,3 +130,17 @@ paginada não embuta uma decisão que nunca passou pelo gate.
 - [0002 — Escopo do produto](docs/decisions/0002-escopo-do-produto.md)
 - [0003 — Fatia 1: cadastrar e listar assinaturas](docs/decisions/0003-fatia-1-assinaturas.md)
 - [0004 — Modo de condução do agente](docs/decisions/0004-modo-de-conducao.md)
+
+## Agent skills
+
+### Issue tracker
+
+Issues ficam no GitHub Issues de `Migliatti/sciencily`, via `gh`. Ver `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Os cinco papéis padrão, com o mesmo nome de label (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). Ver `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Um contexto só: `CONTEXT.md` na raiz, ADRs em `docs/decisions/`. Ver `docs/agents/domain.md`.
